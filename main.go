@@ -109,14 +109,23 @@ func alert(c *gin.Context) {
 		// TODO : load target address from DB.
 		switch source {
 		case "default":
-			sendAlertSample("1508866205@qq.com", alertText, level+" from "+source)
+			sendAlertSample("1508866205@qq.com", alertText, level+source)
 		default:
-			c.String(http.StatusBadRequest, "Illegal source")
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":   0,
+				"result": "Illegal source",
+			})
 			return
 		}
-		c.String(http.StatusOK, "Ok")
+		c.JSON(http.StatusOK, gin.H{
+			"code":   1,
+			"result": "ok",
+		})
 	} else {
-		c.String(http.StatusBadRequest, "Miss Parameters")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":   0,
+			"result": "Miss Parameters",
+		})
 	}
 }
 
