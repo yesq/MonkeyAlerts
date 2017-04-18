@@ -17,13 +17,12 @@ import (
 
 // Config : smtp config
 type Config struct {
-	Mail      string            `json:"mail"`
-	Password  string            `json:"password"`
-	SMTPURL   string            `json:"smtpURL"`
-	SMTPPort  int               `json:"smtpPort"`
-	APIPort   int               `json:"apiPort"`
-	MySql     string            `json:"mysql"`
-	SourceMap map[string]string `json:"sourceMap"`
+	Mail     string `json:"mail"`
+	Password string `json:"password"`
+	SMTPURL  string `json:"smtpURL"`
+	SMTPPort int    `json:"smtpPort"`
+	APIPort  int    `json:"apiPort"`
+	MySQL    string `json:"mysql"`
 }
 
 //

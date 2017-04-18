@@ -11,7 +11,7 @@ func DB() *sql.DB {
 		return db
 	} else {
 		var err error
-		db, err = sql.Open("mysql", config.MySql)
+		db, err = sql.Open("mysql", config.MySQL)
 		// db.SetMaxOpenConns(10)
 		checkErr(err)
 		return db
