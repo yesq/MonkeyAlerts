@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
-
-	"time"
+	_ "github.com/go-sql-driver/mysql"
 
 	gomail "gopkg.in/gomail.v2"
 )
@@ -22,6 +22,7 @@ type Config struct {
 	SMTPURL   string            `json:"smtpURL"`
 	SMTPPort  int               `json:"smtpPort"`
 	APIPort   int               `json:"apiPort"`
+	MySql     string            `json:"mysql"`
 	SourceMap map[string]string `json:"sourceMap"`
 }
 
@@ -31,8 +32,6 @@ type Config struct {
 var CH chan *gomail.Message
 
 var config Config
-
-// var d *gomail.Dialer
 
 func init() {
 	loadConfig()
@@ -106,14 +105,22 @@ func alert(c *gin.Context) {
 	source := c.PostForm("source")
 	level := c.PostForm("level")
 	alertText := c.PostForm("text")
+
 	if level != "" && alertText != "" {
-		// TODO : load target address from DB.
-		if targetAddr, ok := config.SourceMap[source]; ok {
-			sendAlertSample(targetAddr, alertText, level+" from "+source)
+		if target, touchLimit, ok := GetSourceTarget(source); ok {
+			if touchLimit {
+				sendAlertSample(target, alertText, level+" from "+source)
+			} else {
+				c.JSON(http.StatusOK, gin.H{
+					"code":   1,
+					"result": "Receive your alert, but haven't touch limit",
+				})
+				return
+			}
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code":   0,
-				"result": "Illegal source",
+				"result": "Please send your email to Admin",
 			})
 			return
 		}
