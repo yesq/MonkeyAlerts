@@ -17,11 +17,12 @@ import (
 
 // Config : smtp config
 type Config struct {
-	Mail     string `json:"mail"`
-	Password string `json:"password"`
-	SMTPURL  string `json:"smtpURL"`
-	SMTPPort int    `json:"smtpPort"`
-	APIPort  int    `json:"apiPort"`
+	Mail      string            `json:"mail"`
+	Password  string            `json:"password"`
+	SMTPURL   string            `json:"smtpURL"`
+	SMTPPort  int               `json:"smtpPort"`
+	APIPort   int               `json:"apiPort"`
+	SourceMap map[string]string `json:"sourceMap"`
 }
 
 //
@@ -107,10 +108,9 @@ func alert(c *gin.Context) {
 	alertText := c.PostForm("text")
 	if level != "" && alertText != "" {
 		// TODO : load target address from DB.
-		switch source {
-		case "default":
-			sendAlertSample("1508866205@qq.com", alertText, level+source)
-		default:
+		if targetAddr, ok := config.SourceMap[source]; ok {
+			sendAlertSample(targetAddr, alertText, level+" from "+source)
+		} else {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code":   0,
 				"result": "Illegal source",
