@@ -1,6 +1,10 @@
 package main
 
-import "database/sql"
+import (
+	"database/sql"
+	"strconv"
+	"time"
+)
 
 // TODO : change to Redis
 
@@ -35,18 +39,23 @@ func GetSourceTarget(source string) (target string, touchLimit bool, ok bool) {
 
 // GetSourceInfo
 // target
-// whether touch limit
+// whether mail available
 func GetSourceInfo(source string) (string, bool) {
 	db := DB()
-	rows, err := db.Query("SELECT `target`, `count`, `countLimit` FROM `source` WHERE `source` = \"" + source + "\";")
+	rows, err := db.Query("SELECT `target`, `count`, `countLimit`, `intervalLimit`, `lastAlert` FROM `source` WHERE `source` = \"" + source + "\";")
 	var touchLimit bool
 	var target string
-	var count int
-	var countLimit int
 	for rows.Next() {
-		err = rows.Scan(&target, &count, &countLimit)
+		now := int(time.Now().Unix())
+		var count int
+		var countLimit int
+		var intervalLimit int
+		var lastAlert int
+		err = rows.Scan(&target, &count, &countLimit, &intervalLimit, &lastAlert)
 		checkErr(err)
-		if count > countLimit {
+		touchCountsLimit := count > countLimit
+		touchTimeLimit := now > (lastAlert + intervalLimit)
+		if touchCountsLimit && touchTimeLimit {
 			resetCount(source)
 			touchLimit = true
 		}
@@ -56,7 +65,8 @@ func GetSourceInfo(source string) (string, bool) {
 
 func resetCount(source string) {
 	db := DB()
-	_, err := db.Query("UPDATE `source` SET `count`=0 WHERE `source`=\"" + source + "\"")
+	now := int(time.Now().Unix())
+	_, err := db.Query("UPDATE `source` SET `count`=0, `lastAlert`=" + strconv.Itoa(now) + " WHERE `source`=\"" + source + "\"")
 	checkErr(err)
 }
 
