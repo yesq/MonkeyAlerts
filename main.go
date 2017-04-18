@@ -24,7 +24,7 @@ var CH chan *gomail.Message
 
 var config Config
 
-var d *gomail.Dialer
+// var d *gomail.Dialer
 
 func init() {
 	loadConfig()
@@ -57,7 +57,7 @@ func sendAlertSample(addTo, body, title string) {
 func daemonMailClient() {
 	CH = make(chan *gomail.Message)
 	defer close(CH)
-	d = gomail.NewDialer(config.SMTPURL, config.SMTPPort, config.Mail, config.Password)
+	d := gomail.NewDialer(config.SMTPURL, config.SMTPPort, config.Mail, config.Password)
 	var s gomail.SendCloser
 	var err error
 	open := false
