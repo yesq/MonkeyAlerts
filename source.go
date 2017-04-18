@@ -2,10 +2,20 @@ package main
 
 import "database/sql"
 
+// TODO : change to Redis
+
+var db *sql.DB
+
 func DB() *sql.DB {
-	db, err := sql.Open("mysql", config.MySql)
-	checkErr(err)
-	return db
+	if db != nil {
+		return db
+	} else {
+		var err error
+		db, err = sql.Open("mysql", config.MySql)
+		// db.SetMaxOpenConns(10)
+		checkErr(err)
+		return db
+	}
 }
 
 // GetTarget : source - target
@@ -37,10 +47,17 @@ func GetSourceInfo(source string) (string, bool) {
 		err = rows.Scan(&target, &count, &countLimit)
 		checkErr(err)
 		if count > countLimit {
+			resetCount(source)
 			touchLimit = true
 		}
 	}
 	return target, touchLimit
+}
+
+func resetCount(source string) {
+	db := DB()
+	_, err := db.Query("UPDATE `source` SET `count`=0 WHERE `source`=\"" + source + "\"")
+	checkErr(err)
 }
 
 func checkErr(err error) {

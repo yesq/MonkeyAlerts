@@ -110,6 +110,11 @@ func alert(c *gin.Context) {
 		if target, touchLimit, ok := GetSourceTarget(source); ok {
 			if touchLimit {
 				sendAlertSample(target, alertText, level+" from "+source)
+				c.JSON(http.StatusOK, gin.H{
+					"code":   1,
+					"result": "ok",
+				})
+				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{
 					"code":   1,
@@ -124,15 +129,12 @@ func alert(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"code":   1,
-			"result": "ok",
-		})
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":   0,
 			"result": "Miss Parameters",
 		})
+		return
 	}
 }
 
