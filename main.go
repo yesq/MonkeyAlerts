@@ -46,32 +46,24 @@ func loadConfig() error {
 }
 
 func sendAlertSample(addTo, body, title string) {
-	println("send line 1")
 	m := gomail.NewMessage()
 	m.SetHeader("From", config.Mail)
 	m.SetHeader("To", addTo)
 	m.SetHeader("Subject", title)
 	m.SetBody("text/html", body)
-	// CH <- m
-	println("send CH")
 	CH <- m
 }
 
 func daemonMailClient() {
-	println("daemon start")
 	CH = make(chan *gomail.Message)
 	defer close(CH)
-	defer println("exec defer")
 	d = gomail.NewDialer(config.SMTPURL, config.SMTPPort, config.Mail, config.Password)
 	var s gomail.SendCloser
 	var err error
 	open := false
-	println("for start")
 	for {
-		println("for 1")
 		select {
 		case m, ok := <-CH:
-			println("<-CH")
 			if !ok { // 是否 close(CH)
 				return
 			}
@@ -83,10 +75,8 @@ func daemonMailClient() {
 			}
 			if err := gomail.Send(s, m); err != nil {
 				println(err)
-				// log.Print(err) //log?
 			}
 		case <-time.After(30 * time.Second):
-			println("<-timeout")
 			if open {
 				if err := s.Close(); err != nil {
 					panic(err)
