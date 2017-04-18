@@ -19,6 +19,7 @@ The goal of this project is to watch service. If necessary, send mail to watcher
     `count` char(11) DEFAULT '0',
     `intervalLimit` int(11) DEFAULT '300',
     `lastAlert` int(11) DEFAULT '0',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `sour` (`source`)
   ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 ```
