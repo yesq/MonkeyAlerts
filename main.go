@@ -4,7 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 
 	"time"
 
@@ -17,7 +21,10 @@ type Config struct {
 	Password string `json:"password"`
 	SMTPURL  string `json:"smtpURL"`
 	SMTPPort int    `json:"smtpPort"`
+	APIPort  int    `json:"apiPort"`
 }
+
+//
 
 // CH : channel to transport mail
 var CH chan *gomail.Message
@@ -87,11 +94,32 @@ func daemonMailClient() {
 	}
 }
 
-func main() {
-	for {
-		select {
-		case <-time.After(40 * time.Second):
-			sendAlertSample("1508866205@qq.com", "test", "title")
+// runAPIServer : server to receive mail task
+func runAPIServer() {
+	router := gin.Default()
+	router.POST("/alert", alert)
+	router.Run(":" + strconv.Itoa(config.APIPort))
+}
+
+func alert(c *gin.Context) {
+	source := c.PostForm("source")
+	level := c.PostForm("level")
+	alertText := c.PostForm("text")
+	if level != "" && alertText != "" {
+		// TODO : load target address from DB.
+		switch source {
+		case "default":
+			sendAlertSample("1508866205@qq.com", alertText, level+" from "+source)
+		default:
+			c.String(http.StatusBadRequest, "Illegal source")
+			return
 		}
+		c.String(http.StatusOK, "Ok")
+	} else {
+		c.String(http.StatusBadRequest, "Miss Parameters")
 	}
+}
+
+func main() {
+	runAPIServer()
 }
