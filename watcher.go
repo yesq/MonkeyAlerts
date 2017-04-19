@@ -57,6 +57,9 @@ func watcherAlert(source string, errBody string) {
 			println("send mail")
 			sendAlertSample(target, errBody, "service error from "+source)
 			resetCount(source)
+			logSendMail(source, errBody)
+		} else {
+			logAlert(source, errBody)
 		}
 	}
 }

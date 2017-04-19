@@ -110,12 +110,14 @@ func alert(c *gin.Context) {
 		if target, touchLimit, ok := GetSourceTarget(source); ok {
 			if touchLimit {
 				sendAlertSample(target, alertText, level+" from "+source)
+				logSendMail(source, alertText)
 				c.JSON(http.StatusOK, gin.H{
 					"code":   1,
 					"result": "ok",
 				})
 				return
 			} else {
+				logAlert(source, alertText)
 				c.JSON(http.StatusOK, gin.H{
 					"code":   1,
 					"result": "Receive your alert, but haven't touch limit",
