@@ -36,6 +36,7 @@ func init() {
 	loadConfig()
 	fmt.Println(config)
 	go daemonMailClient()
+	go daemonWatcher()
 }
 
 func loadConfig() error {

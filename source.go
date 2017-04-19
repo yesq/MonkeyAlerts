@@ -43,6 +43,7 @@ func GetSourceTarget(source string) (target string, touchLimit bool, ok bool) {
 func GetSourceInfo(source string) (string, bool) {
 	db := DB()
 	rows, err := db.Query("SELECT `target`, `count`, `countLimit`, `intervalLimit`, `lastAlert` FROM `source` WHERE `source` = \"" + source + "\";")
+	defer rows.Close()
 	var touchLimit bool
 	var target string
 	for rows.Next() {
