@@ -44,3 +44,25 @@ The goal of this project is to listen and watch service. If necessary, send mail
   - log `alert`
   - log `send mail`
   - load `source`, `requestTask` from Redis
+
+## Test Flow chart
+
+
+```flow
+st=>start: Start
+cmdSetted=>condition: cmd is setted?
+sourceType=>condition: source file come from workspace, not grazier?
+copySource=>operation: copy source to default source path.
+saveSource=>operation: save source stirng to default source path.
+makeConfdTmpl=>operation: make confd tmpl.
+storeTypeSetted=>condition: store type is setted?
+runConfd=>operation: run confd with cmd value
+e=>end
+
+st->cmdSetted
+cmdSetted(yes)->runConfd->e
+cmdSetted(no)->sourceType
+sourceType(yes)->copySource->makeConfdTmpl
+sourceType(no)->saveSource->makeConfdTmpl
+makeConfdTmpl->runConfd->copyDest->e
+```
