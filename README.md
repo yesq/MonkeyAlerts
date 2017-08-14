@@ -48,21 +48,8 @@ The goal of this project is to listen and watch service. If necessary, send mail
 ## Test Flow chart
 
 
-```flow
-st=>start: Start
-cmdSetted=>condition: cmd is setted?
-sourceType=>condition: source file come from workspace, not grazier?
-copySource=>operation: copy source to default source path.
-saveSource=>operation: save source stirng to default source path.
-makeConfdTmpl=>operation: make confd tmpl.
-storeTypeSetted=>condition: store type is setted?
-runConfd=>operation: run confd with cmd value
-e=>end
-
-st->cmdSetted
-cmdSetted(yes)->runConfd->e
-cmdSetted(no)->sourceType
-sourceType(yes)->copySource->makeConfdTmpl
-sourceType(no)->saveSource->makeConfdTmpl
-makeConfdTmpl->runConfd->copyDest->e
+```sequence
+Alice->Bob: Hello Bob, how are you?
+Note right of Bob: Bob thinks
+Bob-->Alice: I am good thanks!
 ```
